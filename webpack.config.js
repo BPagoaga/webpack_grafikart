@@ -31,7 +31,14 @@ let config = {
         path: path.resolve('./dist'),
         // récupère le nom donné en entrée, par défaut bundle.js
         filename: dev ? '[name].js' : '[name].[chunkhash].js',
-        publicPath: './dist/assets/js/'
+        //publicPath: './dist/'
+    },
+
+    resolve: {
+        alias: {
+            '@css': path.resolve('./assets/scss/'),
+            '@js': path.resolve('./assets/js/')
+        }
     },
 
     // lance le watch uniquement en mode dev
@@ -40,6 +47,12 @@ let config = {
     // loaders
     module: {
         rules: [{
+                enforce: "pre",
+                test: /\.js$/,
+                exclude: /(node_modules|bower_components)/,
+                use: ['eslint-loader'],
+            },
+            {
                 test: /\.js$/,
                 exclude: /(node_modules|bower_components)/,
                 use: ['babel-loader'],
@@ -60,8 +73,28 @@ let config = {
                 use: ExtractTextPlugin.extract({
                     fallback: "style-loader",
                     use: [...cssLoaders, "sass-loader"],
-                    publicPath: './dist/assets/css/'
                 })
+            },
+            {
+                test: /\.(woff2?|eot|ttf|otf|wav)(\?.*)?$/,
+                loader: "file-loader"
+            },
+            {
+                test: /\.(png|jpg|gif|svg)$/,
+                use: [{
+                        loader: 'url-loader',
+                        options: {
+                            name: '[name].[hash:7].[ext]',
+                            limit: 8192
+                        }
+                    },
+                    {
+                        loader: 'img-loader',
+                        options: {
+                            enabled: !dev
+                        }
+                    }
+                ]
             }
         ]
     },
@@ -70,7 +103,7 @@ let config = {
     plugins: [
         new ExtractTextPlugin({
             filename: dev ? '[name].css' : '[name].[contenthash:8].css',
-            disable: dev
+            disable: false
         }),
 
     ],

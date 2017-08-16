@@ -1,4 +1,4 @@
 export default {
-    // juste un exemple
-    cache: true
+  // juste un exemple
+  cache: true
 }
